@@ -1,11 +1,14 @@
 """
-    This script provides the ability 
-    to analyze an input csv file 
+    This script provides the ability
+    to analyze an input csv file
     containing information about company employees
-    
+
     File format:
     - Full name;department;team;job title;mark;salary
 """
+
+import os
+from typing import Callable, Dict, Union
 
 INPUT_FNAME = 'Corp_Summary.csv'
 OUTPUT_FNAME = 'output.csv'
@@ -24,7 +27,7 @@ def interactive_menu(src_file: list) -> None:
     """
         Main function of the program.
 
-        Calls up an interactive menu 
+        Calls up an interactive menu
         with which you can call up the corresponding functions
     """
 
@@ -55,7 +58,7 @@ def first_mode(src_file: list) -> None:
     """
         Function to display command hierarchy
     """
-    dep_team = {}
+    dep_team: Dict[str, list] = {}
     for line in src_file:
         department = line[1]
         team = line[2]
@@ -72,21 +75,21 @@ def first_mode(src_file: list) -> None:
 
 
 def second_mode(src_file: list, save: bool = False,
-                save_fname: str = None) -> None:
+                save_fname: Union[str, bytes, os.PathLike] = '') -> None:
     """
-        A function that provides the ability 
-        to display a summary report 
+        A function that provides the ability
+        to display a summary report
         by department with the ability to save it to a csv file
 
-        You MUST be sure to PASS the name of the output file 
+        You MUST be sure to PASS the name of the output file
         if save=True
         otherwise you should NOT DO IT
     """
-    assert not (save ^ (save_fname is not None)),\
+    assert not (save ^ (save_fname != '')),\
         'Не передано имя файла' if save\
         else 'Лишняя передача имени файла, т.к. сохранение отключено'
 
-    dep_info = {}
+    dep_info: Dict[str, tuple] = {}
     for line in src_file:
         department = line[1]
         salary = int(line[-1])
@@ -115,8 +118,7 @@ def second_mode(src_file: list, save: bool = False,
         ]
 
         for key, val in dep_info.items():
-            val = list(map(str, val))
-            result.append([key, *val])
+            result.append([key, *list(map(str, val))])
 
         with open(save_fname, mode='w', encoding='UTF-8') as output:
             output.write('\n'.join([';'.join(i) for i in result]))
@@ -124,17 +126,17 @@ def second_mode(src_file: list, save: bool = False,
 
 def third_mode(src_file: list) -> None:
     """
-        A function that calls the 
-        second_mode function 
+        A function that calls the
+        second_mode function
         with the necessary parameters to save the result to a file
     """
     second_mode(src_file, save=True, save_fname=OUTPUT_FNAME)
     print('Сохранено!')
 
 
-MODES = {'1': first_mode,
-         '2': second_mode,
-         '3': third_mode}
+MODES: Dict[str, Callable] = {'1': first_mode,
+                              '2': second_mode,
+                              '3': third_mode}
 
 if __name__ == '__main__':
     file = read_file(INPUT_FNAME)
