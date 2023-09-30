@@ -1,1 +1,1 @@
-# aaa_hw2
+# AAA second task
